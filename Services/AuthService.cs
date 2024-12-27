@@ -1,6 +1,7 @@
 ﻿using LoginService.Models;
 using LoginService.Repositories;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -13,11 +14,13 @@ namespace LoginService.Services
     {
         private readonly IUserRepository _userRepository;
         private readonly IMemoryCache _cache;
+        private readonly IConfiguration _configuration;
 
-        public AuthService(IUserRepository userRepository, IMemoryCache cache)
+        public AuthService(IUserRepository userRepository, IMemoryCache cache, IConfiguration configuration)
         {
             _userRepository = userRepository;
             _cache = cache;
+            _configuration = configuration;
         }
 
         public string Authenticate(string username, string password)
@@ -36,6 +39,7 @@ namespace LoginService.Services
                 Token = token,
                 UserId = user.UserId,
                 CreatedAt = DateTime.UtcNow,
+                ExpiresAt = DateTime.UtcNow.AddHours(1), // Set expiration time
                 IsValid = true
             };
 
@@ -72,6 +76,7 @@ namespace LoginService.Services
             // Compare the hashed password with the stored hash
             return hashedPassword == storedHash;
         }
+
         public static string HashPassword(string password, string salt)
         {
             using (var sha256 = SHA256.Create())
@@ -87,24 +92,38 @@ namespace LoginService.Services
             }
         }
 
-        private string GenerateJwtToken(User user)
+        public string GenerateJwtToken(User user)
         {
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.UTF8.GetBytes("YourSecretKey");
-            var tokenDescriptor = new SecurityTokenDescriptor
+            var jwtSettings = _configuration.GetSection("JwtSettings");
+            var key = jwtSettings["Key"];
+            var issuer = jwtSettings["Issuer"];
+            var audience = jwtSettings["Audience"];
+            var expireMinutes = int.Parse(jwtSettings["ExpireMinutes"]);
+
+            // Ensure the key is at least 32 bytes (256 bits)
+            if (Encoding.UTF8.GetBytes(key).Length < 32)
             {
-                Subject = new ClaimsIdentity(new Claim[]
-                {
-                new Claim(ClaimTypes.Name, user.Username),
-                new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString())
-                }),
-                Expires = DateTime.UtcNow.AddHours(1),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+                throw new ArgumentOutOfRangeException("JwtSettings:Key", "The JWT key must be at least 32 bytes (256 bits).");
+            }
+
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
+            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+
+            var claims = new[]
+            {
+                new Claim(JwtRegisteredClaimNames.Sub, user.Username),
+                new Claim(JwtRegisteredClaimNames.Email, user.Email),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            return tokenHandler.WriteToken(token);
+
+            var token = new JwtSecurityToken(
+                issuer: issuer,
+                audience: audience,
+                claims: claims,
+                expires: DateTime.UtcNow.AddMinutes(expireMinutes),
+                signingCredentials: credentials);
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
         }
     }
-
-
 }

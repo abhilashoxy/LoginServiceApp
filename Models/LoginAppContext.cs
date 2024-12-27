@@ -59,7 +59,7 @@ public partial class LoginAppContext : DbContext
             entity.HasKey(e => e.SessionId).HasName("PK__Sessions__C9F49290627F8B11");
 
             entity.Property(e => e.CreatedAt)
-                .HasDefaultValueSql("(getdate())")
+                .HasDefaultValueSql("GETDATE()")
                 .HasColumnType("datetime");
             entity.Property(e => e.ExpiresAt).HasColumnType("datetime");
             entity.Property(e => e.IsValid).HasDefaultValue(true);

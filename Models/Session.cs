@@ -13,9 +13,9 @@ public partial class Session
 
     public bool IsValid { get; set; }
 
-    public DateTime? CreatedAt { get; set; }
+    public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
 
-    public DateTime ExpiresAt { get; set; }
+    public DateTime? ExpiresAt { get; set; }
 
     public virtual User User { get; set; } = null!;
 }

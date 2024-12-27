@@ -1,6 +1,7 @@
 ﻿using LoginService.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace LoginService.Controllers
 {
@@ -32,8 +33,21 @@ namespace LoginService.Controllers
 
             return BadRequest(new { Message = result });
         }
+        [HttpGet("registered")]
+        public async Task<IActionResult> GetRegisteredUsers()
+        {
+            try
+            {
+                var users = await _userService.GetRegisteredUsersAsync();
+                return Ok(users);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error fetching users", error = ex.Message });
+            }
+        }
     }
-
+    
     public class RegisterRequest
     {
         public string Username { get; set; }

@@ -1,5 +1,6 @@
 ﻿using LoginService.Models;
 using LoginService.Repositories;
+using LoginService.ViewModel;
 
 namespace LoginService.Services
 {
@@ -43,5 +44,19 @@ namespace LoginService.Services
 
             return "User registered successfully.";
         }
+        public async Task<List<RegisteredUserDto>> GetRegisteredUsersAsync()
+        {
+            var users = await _userRepository.GetAllUsersAsync();
+
+            // Transform the data into DTOs
+            return users.Select(user => new RegisteredUserDto
+            {
+                UserId = user.UserId,
+                Username = user.Username,
+                Email = user.Email,
+                CreatedDate = user.CreatedDate
+            }).ToList();
+        }
+
     }
 }

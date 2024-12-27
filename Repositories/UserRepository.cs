@@ -1,4 +1,5 @@
 ﻿using LoginService.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace LoginService.Repositories
 {
@@ -27,6 +28,11 @@ namespace LoginService.Repositories
         {
             return _context.Sessions.FirstOrDefault(s => s.Token == token && s.IsValid);
         }
+        public async Task<List<User>> GetAllUsersAsync()
+        {
+            return await _context.Users.ToListAsync();
+        }
+
 
         public void InvalidateSession(string token)
         {

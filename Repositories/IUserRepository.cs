@@ -10,6 +10,7 @@ namespace LoginService.Repositories
         void InvalidateSession(string token);
         void AddUser(User user);
         User GetUserByEmail(string email);
+        Task<List<User>> GetAllUsersAsync();
     }
 
 
