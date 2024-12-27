@@ -1,1 +1,32 @@
+# General Visual Studio
 .vs/
+.vscode/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Build output
+bin/
+obj/
+Debug/
+Release/
+
+# Common ASP.NET Core and .NET Files
+appsettings.Development.json
+appsettings.*.json
+*.pdb
+*.db
+*.log
+*.tmp
+
+# User-specific files
+*.rsuser
+*.opendb
+.idea/
+
+# Auto-generated files
+Generated/
+
+# Resharper files
+*.Dot

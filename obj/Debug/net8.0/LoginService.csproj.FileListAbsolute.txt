@@ -135,3 +135,4 @@ D:\Practice\dotnetcorepractice\LoginApp\LoginService\obj\Debug\net8.0\refint\Log
 D:\Practice\dotnetcorepractice\LoginApp\LoginService\obj\Debug\net8.0\LoginService.pdb
 D:\Practice\dotnetcorepractice\LoginApp\LoginService\obj\Debug\net8.0\LoginService.genruntimeconfig.cache
 D:\Practice\dotnetcorepractice\LoginApp\LoginService\obj\Debug\net8.0\ref\LoginService.dll
+D:\Practice\dotnetcorepractice\LoginApp\LoginService\obj\Debug\net8.0\LoginService.sourcelink.json

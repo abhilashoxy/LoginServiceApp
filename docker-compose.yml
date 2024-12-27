@@ -1,0 +1,21 @@
+version: '3.8'
+services:
+  loginservice:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80"
+    environment:
+      ASPNETCORE_URLS: http://0.0.0.0:80
+      ASPNETCORE_ENVIRONMENT: Development
+      DOTNET_USE_POLLING_FILE_WATCHER: "true"
+      # Update the connection string to point to your local SQL Server
+      ConnectionStrings__DefaultConnection: "Server=host.docker.internal,1433;Database=LoginApp;User Id=abhilashdev;Password=Abhilash$1992;Encrypt=True;TrustServerCertificate=True;"
+    networks:
+      - app-network
+    restart: always
+
+networks:
+  app-network:
+    driver: bridge
